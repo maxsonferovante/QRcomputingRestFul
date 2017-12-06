@@ -1,13 +1,22 @@
 #!flask/bin/python
+
 from flask import Flask, jsonify, abort, make_response
 from flask.ext.restful import Api, Resource, reqparse, fields, marshal
 from flask.ext.httpauth import HTTPBasicAuth
+
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
 app = Flask(__name__, static_url_path="")
+
+
 api = Api(app )
 auth = HTTPBasicAuth()
+
+app.config["MYSQL_DATABESE_USER"] = "myapp"
+app.config["MYSQL_DATABESE_PASSWORD"] = "android1234"
+app.config["MYSQL_DATABESE_DB"] = "mydb"
+app.config["MYSQL_DATABESE_HOST"] = "localhost"
 
 @auth.get_password
 def get_password(username):
@@ -66,10 +75,11 @@ students = [
         "id":7,
         "name":u"Felipe Pereira Ramos",
         "done":False
-    }
+    },
 ]
 
 student_fields = {
+    "id":fields.Integer,
     "name":fields.String,
     'done': fields.Boolean,
     "uri" : fields.Url("student")
@@ -99,6 +109,8 @@ class StudentListAPI(Resource):
 
         }
         students.append(student)
+        print (students)
+
         return {'student': marshal(student, student_fields)}, 201
 
 class StudentAPI(Resource):
@@ -147,4 +159,4 @@ api.add_resource(StudentAPI,'/computing/api/v1.0/students/<int:id>', endpoint ="
 
 
 if __name__ == '__main__':
-    app.run(host = "192.168.1.6", port ="5000")
+    app.run(host = "172.16.2.235", port ="5000")
